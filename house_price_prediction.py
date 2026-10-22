@@ -37,8 +37,9 @@ data['sale_month'] = data['date'].dt.month
 data['house_age'] = data['sale_year'] - data['yr_built']
 data['years_since_renovation'] = data.apply(
     lambda row: row['sale_year'] - row['yr_renovated'] if row['yr_renovated'] != 0 else 0, axis=1)
-data['price_per_sqft'] = data['price'] / data['sqft_living']
 
+# Note: price_per_sqft is derived from the target (price), so it is not used as a feature —
+# including it would leak the answer into the model and inflate every metric.
 data.drop(columns=['id', 'date', 'yr_built', 'yr_renovated'], inplace=True)
 
 # Train-test split
@@ -49,7 +50,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_
 # Scale numerical features
 scaler = StandardScaler()
 num_cols = ['sqft_living', 'sqft_lot', 'sqft_above', 'sqft_basement', 'lat', 'long', 
-            'sqft_living15', 'sqft_lot15', 'house_age', 'years_since_renovation', 'price_per_sqft']
+            'sqft_living15', 'sqft_lot15', 'house_age', 'years_since_renovation']
 X_train[num_cols] = scaler.fit_transform(X_train[num_cols])
 X_test[num_cols] = scaler.transform(X_test[num_cols])
 
